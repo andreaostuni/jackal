@@ -124,13 +124,13 @@
     <xacro:property name="lidar_3d_model" value="$(optenv JACKAL_LASER_3D_MODEL vlp16)" />
     <!-- Velodyne VLP16 -->
     <xacro:if value="${lidar_3d_model == 'vlp16'}">
-      <xacro:vlp16_mount topic="${topic}" tower="${tower}" prefix="${prefix}" parent_link="${parent}" >
+      <xacro:vlp16_mount topic="${topic}" tower="${tower}" prefix="${prefix}" parent_link="${parent}">
         <origin xyz="$(optenv JACKAL_LASER_3D_OFFSET 0 0 0)" rpy="$(optenv JACKAL_LASER_3D_RPY 0 0 0)" />
       </xacro:vlp16_mount>
     </xacro:if>
     <!-- Velodyne HDL-32E -->
     <xacro:if value="${lidar_3d_model == 'hdl32e'}">
-      <xacro:hdl32e_mount topic="${topic}" tower="${tower}" prefix="${prefix}" parent_link="${parent}" >
+      <xacro:hdl32e_mount topic="${topic}" tower="${tower}" prefix="${prefix}" parent_link="${parent}">
         <origin xyz="$(optenv JACKAL_LASER_3D_OFFSET 0 0 0)" rpy="$(optenv JACKAL_LASER_3D_RPY 0 0 0)" />
       </xacro:hdl32e_mount>
     </xacro:if>
@@ -204,6 +204,7 @@
 
   <!-- 
     Add Cameras. 
+    - JACKAL_D435
     - JACKAL_FLEA3
     - JACKAL_STEREO_FLEA3
     - JACKAL_BB2
@@ -212,6 +213,21 @@
   <!-- Common camera mounts and accessory URDFs. -->
   <xacro:include filename="$(find jackal_description)/urdf/accessories/camera_mount.urdf.xacro" />
   <!--xacro:include filename="$(find pointgrey_camera_description)/urdf/pointgrey_flea3.urdf.xacro" /-->
+
+  <!-- If enabled, generate the d435 camera payload. -->
+
+  <xacro:if value="$(optenv JACKAL_D435 0)">
+    <xacro:property name="name" value="$(optenv JACKAL_D435_NAME front)" />
+    <xacro:property name="mount" value="$(optenv JACKAL_D435_MOUNT front)" />
+    <xacro:property name="camera_xyz" default="$(optenv JACKALD435_XYZ 0.042 0.0 0.0)" />
+    <xacro:property name="camera_rpy" default="$(optenv JACKALD435_RPY 0.0 0.0 0.0)" />
+    <xacro:property name="prefix" value="$(optenv JACKAL_D435_PREFIX ${mount})" />
+    <xacro:property name="parent" value="$(optenv JACKAL_D435_PARENT ${mount}_mount)" />
+    <xacro:property name="camera_frame_id" value="$(optenv JACKAL_D435_FRAME camera_color_frame)" />
+
+    <xacro:include filename="$(find jackal_description)/urdf/accessories/d435.urdf.xacro" />
+  </xacro:if>
+
 
   <!-- If enabled, generate the flea3 camera payload with a tilt of 30 degrees. -->
   <xacro:if value="$(optenv JACKAL_FLEA3 0)">
@@ -222,17 +238,14 @@
     <xacro:property name="prefix" value="$(optenv JACKAL_FLEA3_PREFIX ${mount})" />
     <xacro:property name="parent" value="$(optenv JACKAL_FLEA3_PARENT ${mount}_mount)" />
 
-    <xacro:pointgrey_flea3 frame="${prefix}_camera" name="${name}"
-      camera_x="0.0754" camera_y="0.029" camera_z="0.029"
-      camera_mass="0.085" hfov="1.0471975512" fps="60" width="640" height="512"/>
+    <xacro:pointgrey_flea3 frame="${prefix}_camera" name="${name}" camera_x="0.0754" camera_y="0.029" camera_z="0.029" camera_mass="0.085" hfov="1.0471975512" fps="60" width="640" height="512"/>
 
     <!-- Mount Enabled -->
     <xacro:if value="${tower}">
       <xacro:camera_mount prefix="${prefix}" tilt="${tilt}"/>
 
       <joint name="${prefix}_camera_mount_joint" type="fixed">
-        <origin xyz="$(optenv JACKAL_FLEA3_OFFSET 0 0 0)"
-                rpy="$(optenv JACKAL_FLEA3_RPY 0 0 0)" />
+        <origin xyz="$(optenv JACKAL_FLEA3_OFFSET 0 0 0)" rpy="$(optenv JACKAL_FLEA3_RPY 0 0 0)" />
         <parent link="${parent}" />
         <child link="${prefix}_camera_mount" />
       </joint>
@@ -248,14 +261,12 @@
     <xacro:unless value="${tower}">
       <link name="${prefix}_camera_base"/>
       <joint name="${prefix}_camera_base_joint" type="fixed">
-        <origin xyz="$(optenv JACKAL_FLEA3_OFFSET 0 0 0)"
-                rpy="$(optenv JACKAL_FLEA3_RPY 0 0 0)" />
+        <origin xyz="$(optenv JACKAL_FLEA3_OFFSET 0 0 0)" rpy="$(optenv JACKAL_FLEA3_RPY 0 0 0)" />
         <parent link="${parent}" />
         <child link="${prefix}_camera_base" />
       </joint>
       <joint name="${prefix}_camera_joint" type="fixed">
-        <origin xyz="0 0 0.0145"
-                rpy="0 0 0" />
+        <origin xyz="0 0 0.0145" rpy="0 0 0" />
         <parent link="${prefix}_camera_base" />
         <child link="${prefix}_camera" />
       </joint>
@@ -276,24 +287,19 @@
 
     <xacro:stereo_camera_mount prefix="${prefix}" tilt="${tilt}"/>
     <joint name="${prefix}_stereo_camera_mount_joint" type="fixed">
-      <origin xyz="$(optenv JACKAL_FLEA3_OFFSET 0 0 0)"
-              rpy="$(optenv JACKAL_FLEA3_RPY 0 0 0)" />
+      <origin xyz="$(optenv JACKAL_FLEA3_OFFSET 0 0 0)" rpy="$(optenv JACKAL_FLEA3_RPY 0 0 0)" />
       <parent link="${parent}" />
       <child link="${prefix}_stereo_camera_mount" />
     </joint>
 
-    <xacro:pointgrey_flea3 frame="${prefix}_left_camera" name="${left_name}"
-      camera_x="0.0754" camera_y="0.029" camera_z="0.029"
-      camera_mass="0.085" hfov="1.0471975512" fps="60" width="640" height="512"/>
+    <xacro:pointgrey_flea3 frame="${prefix}_left_camera" name="${left_name}" camera_x="0.0754" camera_y="0.029" camera_z="0.029" camera_mass="0.085" hfov="1.0471975512" fps="60" width="640" height="512"/>
     <joint name="${prefix}_left_stereo_camera_bracket_joint" type="fixed">
       <origin xyz="0.015 ${separation} 0.0599" rpy="0 0 0" />
       <parent link="${prefix}_stereo_camera_beam" />
       <child link="${prefix}_left_camera" />
     </joint>
 
-    <xacro:pointgrey_flea3 frame="${prefix}_right_camera" name="${right_name}"
-      camera_x="0.0754" camera_y="0.029" camera_z="0.029"
-      camera_mass="0.085" hfov="1.0471975512" fps="60" width="640" height="512"/>
+    <xacro:pointgrey_flea3 frame="${prefix}_right_camera" name="${right_name}" camera_x="0.0754" camera_y="0.029" camera_z="0.029" camera_mass="0.085" hfov="1.0471975512" fps="60" width="640" height="512"/>
     <joint name="${prefix}_right_stereo_camera_bracket_joint" type="fixed">
       <origin xyz="0.015 -${separation} 0.0599" rpy="0 0 0" />
       <parent link="${prefix}_stereo_camera_beam" />
@@ -321,8 +327,7 @@
       <xacro:camera_mount prefix="${prefix}" tilt="${tilt}"/>
 
       <joint name="${prefix}_camera_mount_joint" type="fixed">
-        <origin xyz="$(optenv JACKAL_BB2_OFFSET 0 0 0)"
-                rpy="$(optenv JACKAL_BB2_RPY 0 0 0)" />
+        <origin xyz="$(optenv JACKAL_BB2_OFFSET 0 0 0)" rpy="$(optenv JACKAL_BB2_RPY 0 0 0)" />
         <parent link="${parent}" />
         <child link="${prefix}_camera_mount" />
       </joint>
@@ -337,8 +342,7 @@
     <xacro:unless value="${tower}">
       <link name="${prefix}_camera_base" type="fixed"/>
       <joint name="${prefix}_camera_base_joint" type="fixed">
-        <origin xyz="$(optenv JACKAL_BB2_OFFSET 0 0 0)"
-                rpy="$(optenv JACKAL_BB2_RPY 0 0 0)" />
+        <origin xyz="$(optenv JACKAL_BB2_OFFSET 0 0 0)" rpy="$(optenv JACKAL_BB2_RPY 0 0 0)" />
         <parent link="${parent}" />
         <child link="${prefix}_camera_base" />
       </joint>
@@ -350,16 +354,11 @@
     </xacro:unless>
   </xacro:if>
 
-  <!-- Fender Accessories --> 
+  <!-- Fender Accessories -->
   <xacro:if value="$(optenv JACKAL_FRONT_ACCESSORY_FENDER 0)">
     <xacro:include filename="$(find jackal_description)/urdf/accessories/hokuyo_ust10.urdf.xacro" />
     <xacro:if value="$(optenv JACKAL_FRONT_FENDER_UST10 0)">
-      <xacro:hokuyo_ust10_mount
-        prefix="front"
-        parent_link="front_fender_accessory_link"
-        min_angle="${-pi/2}"
-        max_angle="${pi/2}"
-        topic="$(optenv JACKAL_FRONT_LASER_TOPIC front/scan)">
+      <xacro:hokuyo_ust10_mount prefix="front" parent_link="front_fender_accessory_link" min_angle="${-pi/2}" max_angle="${pi/2}" topic="$(optenv JACKAL_FRONT_LASER_TOPIC front/scan)">
         <origin xyz="0 0 0" rpy="0 0 0" />
       </xacro:hokuyo_ust10_mount>
     </xacro:if>
@@ -367,12 +366,7 @@
 
   <xacro:if value="$(optenv JACKAL_REAR_ACCESSORY_FENDER 0)">
     <xacro:if value="$(optenv JACKAL_REAR_FENDER_UST10 0)">
-      <xacro:hokuyo_ust10_mount
-        prefix="rear"
-        parent_link="rear_fender_accessory_link"
-        min_angle="${-pi/2}"
-        max_angle="${pi/2}"
-        topic="$(optenv JACKAL_REAR_LASER_TOPIC rear/scan)">
+      <xacro:hokuyo_ust10_mount prefix="rear" parent_link="rear_fender_accessory_link" min_angle="${-pi/2}" max_angle="${pi/2}" topic="$(optenv JACKAL_REAR_LASER_TOPIC rear/scan)">
         <origin xyz="0 0 0" rpy="0 0 0" />
       </xacro:hokuyo_ust10_mount>
     </xacro:if>
