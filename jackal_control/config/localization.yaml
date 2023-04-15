@@ -4,12 +4,12 @@ ekf_node:
     base_link_frame: base_link
     world_frame: odom
     publish_tf: true
+    print_diagnostics: true
     two_d_mode: true
 
     frequency: 50.0
 
     odom0: jackal_velocity_controller/odom
-    # odom0: odom
     odom0_config: [false, false, false,
                   false, false, false,
                   true, true, false,
