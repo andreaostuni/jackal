@@ -228,6 +228,20 @@
     <xacro:include filename="$(find jackal_description)/urdf/accessories/d435.urdf.xacro" />
   </xacro:if>
 
+  <!-- If enabled, generate the d435 camera payload. -->
+
+  <xacro:if value="$(optenv JACKAL_D435_STEREO 0)">
+    <xacro:property name="name" value="$(optenv JACKAL_D435_STEREO_NAME front)" />
+    <xacro:property name="mount" value="$(optenv JACKAL_D435_STEREO_MOUNT front)" />
+    <xacro:property name="camera_xyz" default="$(optenv JACKAL_D435_STEREO_XYZ 0.042 0.0 0.0)" />
+    <xacro:property name="camera_rpy" default="$(optenv JACKAL_D435_STEREO_RPY 0.0 0.0 0.0)" />
+    <xacro:property name="prefix" value="$(optenv JACKAL_D435_STEREO_PREFIX ${mount})" />
+    <xacro:property name="parent" value="$(optenv JACKAL_D435_STEREO_PARENT ${mount}_mount)" />
+    <xacro:property name="camera_frame_id" value="$(optenv JACKAL_D435_STEREO_FRAME camera_infra1_frame)" />
+
+    <xacro:include filename="$(find jackal_description)/urdf/accessories/d435_stereo.urdf.xacro" />
+  </xacro:if>
+
 
   <!-- If enabled, generate the flea3 camera payload with a tilt of 30 degrees. -->
   <xacro:if value="$(optenv JACKAL_FLEA3 0)">
