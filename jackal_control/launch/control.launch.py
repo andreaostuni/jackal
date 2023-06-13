@@ -24,8 +24,8 @@ def generate_launch_description():
 
     config_jackal_velocity_controller = PathJoinSubstitution(
         [FindPackageShare('jackal_control'),
-        'config',
-        'control.yaml'],
+         'config',
+         'control.yaml'],
     )
 
     # Launch Arguments
@@ -36,7 +36,8 @@ def generate_launch_description():
             PathJoinSubstitution([FindExecutable(name='xacro')]),
             ' ',
             PathJoinSubstitution(
-                [FindPackageShare('jackal_description'), 'urdf', 'jackal.urdf.xacro']
+                [FindPackageShare('jackal_description'),
+                 'urdf', 'jackal.urdf.xacro']
             )
         ]
     )
@@ -61,6 +62,7 @@ def generate_launch_description():
             name='ekf_node',
             output='screen',
             parameters=[config_jackal_ekf],
+            condition=UnlessCondition(is_sim)
         ),
 
         # Madgwick Filter
@@ -91,17 +93,19 @@ def generate_launch_description():
         # Joint State Broadcaster
         Node(
             package='controller_manager',
-            executable='spawner.py',
+            executable='spawner',
             arguments=['joint_state_broadcaster'],
             output='screen',
+            condition=UnlessCondition(is_sim)
         ),
 
         # Velocity Controller
         Node(
             package='controller_manager',
-            executable='spawner.py',
+            executable='spawner',
             arguments=['jackal_velocity_controller'],
             output='screen',
+            condition=UnlessCondition(is_sim)
         )
     ])
 
