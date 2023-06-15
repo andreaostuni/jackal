@@ -47,7 +47,13 @@ def generate_launch_description():
     is_sim_arg = DeclareLaunchArgument(
         'is_sim',
         default_value=is_sim)
+    
+    isaac_sim = LaunchConfiguration('isaac_sim', default=False)
 
+    isaac_sim_arg = DeclareLaunchArgument(
+        'isaac_sim',
+        default_value=isaac_sim)
+    
     robot_description_content = ParameterValue(
         Command(LaunchConfiguration('robot_description_command')),
         value_type=str
@@ -112,6 +118,7 @@ def generate_launch_description():
     ld = LaunchDescription()
     ld.add_action(robot_description_command_arg)
     ld.add_action(is_sim_arg)
+    ld.add_action(isaac_sim_arg)
     ld.add_action(localization_group_action)
     ld.add_action(control_group_action)
     return ld
