@@ -155,14 +155,30 @@
 
   <xacro:if value="$(arg is_sim)">
     <!-- CAMERA PLUGIN GAZEBO -->
+    <!-- 
+      FOCAL LENGTH (IN PIXEL NELLA FORMULA DELLA DISPARITY, DIPENDE DALLA RISOLUZIONE USATA)
+      F(mm) = F*(pixels) * SensorWidth(mm) / ImageWidth (pixel)
+      Intrinsic of "Color" / 640x480 / {YUYV/RGB8/BGR8/RGBA8/BGRA8/Y16}
+      Width:      	640
+      Height:     	480
+      PPX:        	324.857025146484
+      PPY:        	251.617706298828
+      Fx:         	606.520935058594
+      Fy:         	605.694885253906
+      Distortion: 	Inverse Brown Conrady
+      Coeffs:     	0  	0  	0  	0  	0  
+      FOV (deg):  	55.63 x 43.22 
+    -->
+
     <xacro:if value="$(optenv JACKAL_D435 0)">
       <gazebo reference="${camera_frame_id}">
         <sensor type="depth" name="d435">
           <always_on>1</always_on>
           <update_rate>30</update_rate>
 
-          <camera name="camera">
-            <horizontal_fov>${60*3.14/180.0}</horizontal_fov>
+          <camera name="camera_color">
+            <vertical_fov>${43.22*3.14/180.0}</vertical_fov>
+            <horizontal_fov>${55.63*3.14/180.0}</horizontal_fov>
             <image>
               <format>R8G8B8</format>
               <width>640</width>
@@ -175,10 +191,16 @@
           </camera>
           <plugin name="camera_plugin" filename="libgazebo_ros_camera.so">
             <!-- Set camera name. If empty, defaults to sensor name (i.e. "sensor_name") -->
-            <camera_name>camera</camera_name>
+            <camera_name>camera_color</camera_name>
 
             <!-- Set TF frame name. If empty, defaults to link name (i.e. "link_name") -->
             <frame_name>camera_color_optical_frame</frame_name>
+
+            <P_cx>324.857025146484</P_cx>
+            <P_cy>251.617706298828</P_cy>
+            <P_fx>606.520935058594</P_fx>
+            <P_fy>605.694885253906</P_fy>
+            <hack_baseline>0.05</hack_baseline>
 
           </plugin>
         </sensor>
@@ -193,10 +215,23 @@
           <update_rate>30</update_rate>
 
           <camera name="left">
+           <!-- 
+            Intrinsic of "Infrared 1" / 640x480 / {Y8}
+            Width:      	640
+            Height:     	480
+            PPX:        	320.354888916016
+            PPY:        	234.069793701172
+            Fx:         	381.184051513672
+            Fy:         	381.184051513672
+            Distortion: 	Brown Conrady
+            Coeffs:     	0  	0  	0  	0  	0  
+            FOV (deg):  	80.03 x 64.38 
+            -->
 
-            <horizontal_fov>${60*3.14/180.0}</horizontal_fov>
+            <horizontal_fov>${80.03*3.14/180.0}</horizontal_fov>
+            <vertical_fov>${64.38*3.14/180.0}</vertical_fov>
             <image>
-              <format>R8G8B8</format>
+              <format>L8</format>
               <width>640</width>
               <height>480</height>
             </image>
@@ -212,13 +247,35 @@
               <mean>0.0</mean>
               <stddev>0.0001</stddev>
           </noise>
+          <lens>
+              <intrinsics>
+                <fx>381.184051513672</fx>
+                <fy>381.184051513672</fy>
+                <cx>320.354888916016</cx>
+                <cy>234.069793701172</cy>
+                <skew>0.0</skew>
+              </intrinsics>
+            </lens>
           </camera>
 
           <camera name="right">
           <pose>0 -0.07 0 0 0 0</pose>
-            <horizontal_fov>${60*3.14/180.0}</horizontal_fov>
+          <!--
+            Intrinsic of "Infrared 2" / 640x480 / {Y8}
+            Width:      	640
+            Height:     	480
+            PPX:        	320.354888916016
+            PPY:        	234.069793701172
+            Fx:         	381.184051513672
+            Fy:         	381.184051513672
+            Distortion: 	Brown Conrady
+            Coeffs:     	0  	0  	0  	0  	0  
+            FOV (deg):  	80.03 x 64.38
+          -->
+            <horizontal_fov>${80.03*3.14/180.0}</horizontal_fov>
+            <vertical_fov>${64.38*3.14/180.0}</vertical_fov>
             <image>
-              <format>R8G8B8</format>
+              <format>L8</format>
               <width>640</width>
               <height>480</height>
             </image>
@@ -233,16 +290,27 @@
                   channels, which at that point lie in the range [0,1]. -->
               <mean>0.0</mean>
               <stddev>0.0001</stddev>
-          </noise>
+            </noise>
+            <lens>
+              <intrinsics>
+                <fx>381.184051513672</fx>
+                <fy>381.184051513672</fy>
+                <cx>320.354888916016</cx>
+                <cy>234.069793701172</cy>
+                <skew>0.0</skew>
+              </intrinsics>
+            </lens>
           </camera>
-
           <plugin name="stereo_camera_plugin" filename="libgazebo_ros_camera.so">
             <!-- Set camera name. If empty, defaults to sensor name (i.e. "sensor_name") -->
             <camera_name>camera_stereo</camera_name>
-
             <!-- Set TF frame name. If empty, defaults to link name (i.e. "link_name") -->
             <frame_name>camera_infra1_optical_frame</frame_name>
             <hack_baseline>0.05</hack_baseline>
+            <P_fx>381.184051513672</P_fx>
+            <P_fy>381.184051513672</P_fy>
+            <P_cx>320.354888916016</P_cx>
+            <P_cy>234.069793701172</P_cy>            
           </plugin>
         </sensor>
       </gazebo>
