@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <robot name="jackal" xmlns:xacro="http://www.ros.org/wiki/xacro">
-  <xacro:arg name="is_sim" default="false" />
+  <xacro:arg name="gazebo_sim" default="False" />
+  <xacro:arg name="isaac_sim" default="False" />
   <xacro:arg name="prefix" default="" />
   <xacro:arg name="gazebo_controllers" default="$(find jackal_control)/config/control.yaml" />
   <xacro:property name="PI" value="3.1415926535897931" />
@@ -255,17 +256,15 @@
   <!-- ROS2 controls -->
   <ros2_control name="jackal_hardware" type="system">
     <hardware>
-      <xacro:if value="$(arg is_sim)">
-        <xacro:if value="$(arg isaac_sim)">
+      <xacro:if value="$(arg isaac_sim)">
             <plugin>topic_based_ros2_control/TopicBasedSystem</plugin>
             <param name="joint_commands_topic">/isaac_joint_commands</param>
             <param name="joint_states_topic">/isaac_joint_states</param>
-        </xacro:if>
-        <xacro:unless value="$(arg isaac_sim)">
-            <plugin>gazebo_ros2_control/GazeboSystem</plugin>
-        </xacro:unless>  
       </xacro:if>
-      <xacro:unless value="$(arg is_sim)">
+      <xacro:if value="$(arg gazebo_sim)">
+            <plugin>gazebo_ros2_control/GazeboSystem</plugin>
+      </xacro:if>
+      <xacro:unless value="${$(arg gazebo_sim) or $(arg isaac_sim)}">
         <plugin>jackal_hardware/JackalHardware</plugin>
         <plugin>fake_components/GenericSystem</plugin>
       </xacro:unless>
@@ -293,7 +292,7 @@
   </ros2_control>
 
   <!-- Bring in simulation data for Gazebo. -->
-  <xacro:if value="$(arg is_sim)">
+  <xacro:if value="$(arg gazebo_sim)">
     <xacro:include filename="$(find jackal_description)/urdf/jackal.gazebo" />
   </xacro:if>
 

@@ -13,10 +13,15 @@ def generate_launch_description():
 
     is_sim_arg = DeclareLaunchArgument('is_sim', default_value=is_sim)
 
-    filepath_config_twist_mux = PathJoinSubstitution(
-        [FindPackageShare('jackal_control'), 'config', 'twist_mux.yaml']
+    filepath_config_twist_mux_arg = DeclareLaunchArgument(
+        'config_twist_mux',
+        default_value = PathJoinSubstitution(
+            [FindPackageShare('jackal_control'), 'config', 'twist_mux.yaml']
+        )
     )
-
+    
+    filepath_config_twist_mux = LaunchConfiguration('config_twist_mux')
+    
     filepath_config_interactive_markers = PathJoinSubstitution(
         [FindPackageShare('jackal_control'), 'config',
          'teleop_interactive_markers.yaml']
@@ -45,4 +50,5 @@ def generate_launch_description():
     ld.add_action(node_interactive_marker_twist_server)
     ld.add_action(is_sim_arg)
     ld.add_action(node_twist_mux)
+    ld.add_action(filepath_config_twist_mux_arg)
     return ld

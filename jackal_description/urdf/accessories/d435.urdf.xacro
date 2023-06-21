@@ -153,7 +153,7 @@
     <link name="${name}_color_optical_frame"/>
   </xacro:if>
 
-  <xacro:if value="$(arg is_sim)">
+  <xacro:if value="$(arg gazebo_sim)">
     <!-- CAMERA PLUGIN GAZEBO -->
     <!-- 
       FOCAL LENGTH (IN PIXEL NELLA FORMULA DELLA DISPARITY, DIPENDE DALLA RISOLUZIONE USATA)
