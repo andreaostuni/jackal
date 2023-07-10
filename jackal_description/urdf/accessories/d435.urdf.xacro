@@ -227,7 +227,7 @@
               <far>100.0</far>
             </clip>
           </camera>
-          <plugin name="camera_plugin" filename="libgazebo_ros_camera.so">
+          <plugin name="left_camera_plugin" filename="libgazebo_ros_camera.so">
             <!-- Set camera name. If empty, defaults to sensor name (i.e. "sensor_name") -->
             <camera_name>camera_stereo_gazebo</camera_name>
 
