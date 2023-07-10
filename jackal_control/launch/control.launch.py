@@ -9,11 +9,17 @@ from launch_ros.parameter_descriptions import ParameterValue
 
 def generate_launch_description():
 
+    config_jackal_ekf = LaunchConfiguration('config_jackal_localization')
+    config_jackal_velocity_controller = LaunchConfiguration('config_jackal_velocity')
+
     # Configs
-    config_jackal_ekf = PathJoinSubstitution(
-        [FindPackageShare('jackal_control'),
-         'config',
-         'localization.yaml'],
+    config_jackal_ekf_arg = DeclareLaunchArgument(
+        'config_jackal_localization',
+        default_value= PathJoinSubstitution(
+            [FindPackageShare('jackal_control'),
+             'config',
+             'localization.yaml'],
+        )
     )
 
     config_imu_filter = PathJoinSubstitution(
@@ -22,10 +28,13 @@ def generate_launch_description():
          'imu_filter.yaml'],
     )
 
-    config_jackal_velocity_controller = PathJoinSubstitution(
-        [FindPackageShare('jackal_control'),
-         'config',
-         'control.yaml'],
+    config_jackal_velocity_controller_arg = DeclareLaunchArgument(
+        'config_jackal_velocity',
+        default_value= PathJoinSubstitution(
+            [FindPackageShare('jackal_control'),
+             'config',
+             'control.yaml'],
+        )
     )
 
     # Launch Arguments
@@ -42,11 +51,11 @@ def generate_launch_description():
         ]
     )
 
-    is_sim = LaunchConfiguration('is_sim', default=False)
+    gazebo_sim = LaunchConfiguration('gazebo_sim', default=False)
 
-    is_sim_arg = DeclareLaunchArgument(
-        'is_sim',
-        default_value=is_sim)
+    gazebo_sim_arg = DeclareLaunchArgument(
+        'gazebo_sim',
+        default_value=gazebo_sim)
     
     isaac_sim = LaunchConfiguration('isaac_sim', default=False)
 
@@ -67,8 +76,7 @@ def generate_launch_description():
             executable='ekf_node',
             name='ekf_node',
             output='screen',
-            parameters=[config_jackal_ekf],
-            condition=UnlessCondition(is_sim)
+            parameters=[config_jackal_ekf]
         ),
 
         # Madgwick Filter
@@ -93,7 +101,7 @@ def generate_launch_description():
                 'stdout': 'screen',
                 'stderr': 'screen',
             },
-            condition=UnlessCondition(is_sim)
+            condition=UnlessCondition(gazebo_sim)
         ),
 
         # Joint State Broadcaster
@@ -102,7 +110,7 @@ def generate_launch_description():
             executable='spawner',
             arguments=['joint_state_broadcaster'],
             output='screen',
-            condition=UnlessCondition(is_sim)
+            condition=UnlessCondition(gazebo_sim)
         ),
 
         # Velocity Controller
@@ -111,14 +119,16 @@ def generate_launch_description():
             executable='spawner',
             arguments=['jackal_velocity_controller'],
             output='screen',
-            condition=UnlessCondition(is_sim)
+            condition=UnlessCondition(gazebo_sim)
         )
     ])
 
     ld = LaunchDescription()
     ld.add_action(robot_description_command_arg)
-    ld.add_action(is_sim_arg)
+    ld.add_action(gazebo_sim_arg)
     ld.add_action(isaac_sim_arg)
     ld.add_action(localization_group_action)
     ld.add_action(control_group_action)
+    ld.add_action(config_jackal_ekf_arg)
+    ld.add_action(config_jackal_velocity_controller_arg)
     return ld

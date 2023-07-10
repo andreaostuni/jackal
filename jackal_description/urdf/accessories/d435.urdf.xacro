@@ -153,7 +153,7 @@
     <link name="${name}_color_optical_frame"/>
   </xacro:if>
 
-  <xacro:if value="$(arg is_sim)">
+  <xacro:if value="$(arg gazebo_sim)">
     <!-- CAMERA PLUGIN GAZEBO -->
     <!-- 
       FOCAL LENGTH (IN PIXEL NELLA FORMULA DELLA DISPARITY, DIPENDE DALLA RISOLUZIONE USATA)
@@ -186,7 +186,7 @@
             </image>
             <clip>
               <near>0.15</near>
-              <far>50.0</far>
+              <far>100.0</far>
             </clip>
           </camera>
           <plugin name="camera_plugin" filename="libgazebo_ros_camera.so">
@@ -200,7 +200,7 @@
             <P_cy>251.617706298828</P_cy>
             <P_fx>606.520935058594</P_fx>
             <P_fy>605.694885253906</P_fy>
-            <hack_baseline>0.05</hack_baseline>
+            <!-- <hack_baseline>0.05</hack_baseline> -->
 
           </plugin>
         </sensor>
@@ -210,6 +210,39 @@
     <xacro:if value="$(optenv JACKAL_D435_STEREO 0)">
       <!-- Both cameras in the pair are anchored off the left camera frame. -->
       <gazebo reference="${stereo_camera_frame_id}">
+        <sensor type="depth" name="depth_left">
+          <always_on>1</always_on>
+          <update_rate>30</update_rate>
+
+          <camera name="camera_stereo_gazebo">
+            <horizontal_fov>${80.03*3.14/180.0}</horizontal_fov>
+            <vertical_fov>${64.38*3.14/180.0}</vertical_fov>
+            <image>
+              <format>R8G8B8</format>
+              <width>640</width>
+              <height>480</height>
+            </image>
+            <clip>
+              <near>0.15</near>
+              <far>100.0</far>
+            </clip>
+          </camera>
+          <plugin name="left_camera_plugin" filename="libgazebo_ros_camera.so">
+            <!-- Set camera name. If empty, defaults to sensor name (i.e. "sensor_name") -->
+            <camera_name>camera_stereo_gazebo</camera_name>
+
+            <!-- Set TF frame name. If empty, defaults to link name (i.e. "link_name") -->
+            <frame_name>camera_infra1_optical_frame</frame_name>
+
+            <P_fx>381.184051513672</P_fx>
+            <P_fy>381.184051513672</P_fy>
+            <P_cx>320.354888916016</P_cx>
+            <P_cy>234.069793701172</P_cy>   
+            <!-- <hack_baseline>0.05</hack_baseline> -->
+
+          </plugin>
+        </sensor>
+    
         <sensor type="multicamera" name="d435_stereo">
           <always_on>1</always_on>
           <update_rate>30</update_rate>
@@ -237,7 +270,7 @@
             </image>
             <clip>
               <near>0.15</near>
-              <far>50.0</far>
+              <far>100.0</far>
             </clip>
             <noise>
               <type>gaussian</type>
@@ -255,11 +288,11 @@
                 <cy>234.069793701172</cy>
                 <skew>0.0</skew>
               </intrinsics>
-            </lens>
+          </lens>
           </camera>
 
           <camera name="right">
-          <pose>0 -0.07 0 0 0 0</pose>
+          <pose>0 -0.05 0 0 0 0</pose>
           <!--
             Intrinsic of "Infrared 2" / 640x480 / {Y8}
             Width:      	640
@@ -281,7 +314,7 @@
             </image>
             <clip>
               <near>0.15</near>
-              <far>50.0</far>
+              <far>100.0</far>
             </clip>
             <noise>
               <type>gaussian</type>
