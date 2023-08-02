@@ -216,7 +216,7 @@
 
   <!-- If enabled, generate the d435 camera payload. -->
   <xacro:property name="d435" value="$(optenv JACKAL_D435 0)" />
-  <xacro:property name="d435_stereo" value="$(optenv JACKAL_D435 0)" />
+  <xacro:property name="d435_stereo" value="$(optenv JACKAL_D435_STEREO 0)" />
   <xacro:if value="${d435 or d435_stereo}">
     <xacro:property name="name" value="$(optenv JACKAL_D435_NAME front)" />
     <xacro:property name="mount" value="$(optenv JACKAL_D435_MOUNT front)" />
