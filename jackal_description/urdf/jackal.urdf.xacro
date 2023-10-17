@@ -3,6 +3,7 @@
   <xacro:arg name="gazebo_sim" default="False" />
   <xacro:arg name="isaac_sim" default="False" />
   <xacro:arg name="prefix" default="" />
+  <xacro:arg name="use_gazebo_controllers" default="True" />
   <xacro:arg name="gazebo_controllers" default="$(find jackal_control)/config/control.yaml" />
   <xacro:property name="PI" value="3.1415926535897931" />
 
