@@ -16,6 +16,8 @@ install(DIRECTORY launch meshes urdf
   DESTINATION share/${PROJECT_NAME}
 )
 
+ament_environment_hooks("${CMAKE_CURRENT_SOURCE_DIR}/env-hooks/${PROJECT_NAME}.dsv.in")
+
 ament_export_dependencies(xacro)
 ament_export_dependencies(urdf)
 ament_package()
