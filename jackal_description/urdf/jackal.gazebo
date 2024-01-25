@@ -147,13 +147,15 @@
           <namespace>/jackal</namespace>
           <!-- <remapping>odom</remapping> -->
         </ros>
+        <frame_name>map</frame_name>
         <body_name>base_link</body_name>
         <update_rate>10</update_rate>
         <gaussian_noise>0.0</gaussian_noise>
         <xyz_offset>0 0 0</xyz_offset>
         <rpy_offset>0 0 0</rpy_offset>
         <publish_tf>true</publish_tf>
-        <publish_map_to_world>true</publish_map_to_world>
+        <relative_velocity>true</relative_velocity>
+        <publish_map_to_world>false</publish_map_to_world>
       </plugin>
   </gazebo>
 
